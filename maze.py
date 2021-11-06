@@ -101,10 +101,48 @@ def read_file(file_name: str = 'maze_map.txt'):
 
 # BFS:
 #def BFS(matrix,start,end,bonus=None):
+class Node:
+    def __init__(self, point: tuple[int, int], parent, deep,act):
+        self.point = point
+        self.parent = parent
+        self.deep = deep
+        self.act = act
+        
     
+    def Up(self):
+        point = (self.point[0],self.point[1]+1)
+        deep = self.deep + 1
+        return Node(point, self, deep, "up")
+    def Down(self):
+        point = (self.point[0],self.point[1]-1)
+        deep = self.deep + 1
+        return Node(point, self, deep, "down")
 
+def Append(node):
+    child = []
+    child.append(node.Up())
+    child.append(node.Down())
+    child.append(node.Left())
+    child.append(node.Right())
+    return child
+    
+def TDG_Reserve(node, end, limit):
+    if (node.point == end):
+        return "stop"
+    elif (node.deep < limit):
+        return "fail"
+    else:
+        for child_node in Append(node):
+            kq = TDG_Reserve(child_node, end, limit)
+def DFS(matrix, start, end, bonus = None):
+    s = Node(start[0], start[1],None,0)
+    limit = len(matrix)
+    return TDG_Reserve(s, end, limit)
 
 if __name__=="__main__":
-    b,m,s,e =read_file()
-    visualize_maze(m,b,s,e)
+    #b,m,s,e =read_file()
+    #visualize_maze(m,b,s,e)
+    s = (2,2)
+    e = (2,1)
+    Append(s,e)
 
