@@ -122,7 +122,26 @@ def DFS(matrix,start,end,bonus=None):
   #e.remove(start)
   return e       
 #DFS without bonus point
-def DFS_a(matrix,start,end):
+def DFS_a(matrix,start,end): #simular with BFS, change queue to stack
+    stack = [start]
+    R, C = len(matrix), len(matrix[0])
+    stack.append((start[0], start[1], 0, [start[0] * C + start[1]]))
+    directions = [[0, 1], [0, -1], [1, 0], [-1, 0]]
+    visited = [[False] * C for _ in range(R)]
+
+    while len(stack) != 0:
+        coord = stack.pop()
+        visited[coord[0]][coord[1]] = True
+
+        if (coord[0],coord[1]) == end:
+            return coord[2], [(i//C, i%C) for i in coord[3]] # Return path length, boxes on path
+
+        for dir in directions:
+            nr, nc = coord[0] + dir[0], coord[1] + dir[1]
+            if (nr < 0 or nr >= R or nc < 0 or nc >= C or matrix[nr][nc] == "x" or visited[nr][nc]): continue
+            stack.append((nr, nc, coord[2] + 1, coord[3] + [nr * C + nc]))
+            
+def DFS_b(matrix,start,end):
     directions = [[0, 1], [0, -1], [1, 0], [-1, 0]]
     R, C = len(matrix), len(matrix[0])
     visited = [[False] * C for _ in range(R)]
