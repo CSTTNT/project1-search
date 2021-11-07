@@ -129,9 +129,8 @@ def DFS(matrix,start,end,bonus=None):
 
 
 if __name__=="__main__":
-    #b,m,s,e =read_file()
-    #visualize_maze(m,b,s,e)
-    s = (2,2)
-    e = (2,1)
-    Append(s,e)
+    b,m,s,e =read_file()
+    route = DFS(m,s,e,b)
+    print(route)
+    visualize_maze(m,b,s,e,route)
 
