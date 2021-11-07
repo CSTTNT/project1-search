@@ -121,29 +121,39 @@ def DFS(matrix,start,end,bonus=None):
               stack.append(k)
   #e.remove(start)
   return e       
-
-# BFS without bonus point:
-def BFS(matrix,start,end):
-    from collections import deque
-    queue = deque()
-
-    R, C = len(matrix), len(matrix[0])
-    queue.appendleft((start[0], start[1], 0, [start[0] * C + start[1]]))
+#DFS without bonus point
+def DFS_a(matrix,start,end):
     directions = [[0, 1], [0, -1], [1, 0], [-1, 0]]
+    R, C = len(matrix), len(matrix[0])
     visited = [[False] * C for _ in range(R)]
-
-    while len(queue) != 0:
-        coord = queue.pop()
+    #stack
+    explored=[start]
+    frontier=[start]
+    dfsPath={}
+    while len(frontier)>0:
+        coord=frontier.pop()
         visited[coord[0]][coord[1]] = True
-
-        if (coord[0],coord[1]) == end:
-            return coord[2], [(i//C, i%C) for i in coord[3]] # Return path length, boxes on path
-
+        if coord==end:
+            break
         for dir in directions:
             nr, nc = coord[0] + dir[0], coord[1] + dir[1]
             if (nr < 0 or nr >= R or nc < 0 or nc >= C or matrix[nr][nc] == "x" or visited[nr][nc]): continue
-            queue.appendleft((nr, nc, coord[2] + 1, coord[3] + [nr * C + nc]))
-
+            child = nr,nc
+            explored.append(child)
+            frontier.append(child)
+            dfsPath[child]=coord
+        
+    fwdPath = {}
+    route = []
+    cell = end
+    lenOfRoute = 0
+    while cell!=start: #find route from end to start
+        fwdPath[dfsPath[cell]]=cell
+        cell=dfsPath[cell]
+        route.append(cell)
+        lenOfRoute = lenOfRoute+1
+    route.reverse()
+    return lenOfRoute, route  
 # BFS with bonus:
 def BFS_bonus(matrix,start,end,bonus):
     from collections import deque
