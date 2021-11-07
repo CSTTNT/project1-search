@@ -122,10 +122,51 @@ def DFS(matrix,start,end,bonus=None):
   #e.remove(start)
   return e       
 
-# BFS:
-#def BFS(matrix,start,end,bonus=None):
+# BFS without bonus point:
+def BFS(matrix,start,end):
+    from collections import deque
+    queue = deque()
 
+    R, C = len(matrix), len(matrix[0])
+    queue.appendleft((start[0], start[1], 0, [start[0] * C + start[1]]))
+    directions = [[0, 1], [0, -1], [1, 0], [-1, 0]]
+    visited = [[False] * C for _ in range(R)]
 
+    while len(queue) != 0:
+        coord = queue.pop()
+        visited[coord[0]][coord[1]] = True
+
+        if (coord[0],coord[1]) == end:
+            return coord[2], [(i//C, i%C) for i in coord[3]] # Return path length, boxes on path
+
+        for dir in directions:
+            nr, nc = coord[0] + dir[0], coord[1] + dir[1]
+            if (nr < 0 or nr >= R or nc < 0 or nc >= C or matrix[nr][nc] == "x" or visited[nr][nc]): continue
+            queue.appendleft((nr, nc, coord[2] + 1, coord[3] + [nr * C + nc]))
+
+# BFS with bonus:
+def BFS_bonus(matrix,start,end,bonus):
+    from collections import deque
+    queue = deque()
+
+    R, C = len(matrix), len(matrix[0])
+    queue.appendleft((start[0], start[1], 0, [start[0] * C + start[1]]))
+    directions = [[0, 1], [0, -1], [1, 0], [-1, 0]]
+    visited = [[False] * C for _ in range(R)]
+
+    while len(queue) != 0:
+        coord = queue.pop()
+        visited[coord[0]][coord[1]] = True
+
+        if (coord[0],coord[1]) == end:
+            return coord[2], [(i//C, i%C) for i in coord[3]] # Return path length, boxes on path
+
+        for dir in directions:
+            nr, nc = coord[0] + dir[0], coord[1] + dir[1]
+            if (nr < 0 or nr >= R or nc < 0 or nc >= C or matrix[nr][nc] == "x" or visited[nr][nc]): continue
+            queue.appendleft((nr, nc, coord[2] + 1, coord[3] + [nr * C + nc]))
+            if (nr, nc) == (bonus[0], bonus[1]):
+                queue.appendleft(nr, nc, coord[2] + 1 + bonus[2], coord[3] + [nr * C + nc])
 
 
 if __name__=="__main__":
