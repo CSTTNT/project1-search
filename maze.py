@@ -98,9 +98,34 @@ def read_file(file_name: str = 'maze_map.txt'):
                 pass
 
     return bonus_points, matrix, start, end
+  
+  
+def DFS(matrix,start,end,bonus=None):
+  stack = [start]
+  e = []
+  while len(stack)!=0:
+      s = stack.pop()
+      e.append(s)
+      neighbor=[]
+      for i in [-1,1]: 
+          if matrix[s[0]][s[1]+i] != 'x':
+              neighbor.append((s[0],s[1]+i))
+      for i in [-1,1]:
+          if matrix[s[0]+i][s[1]] != 'x':
+              neighbor.append((s[0]+i,s[1]))
+      if(end in neighbor):
+          e.append(end)
+          return e
+      for k in neighbor:
+          if k not in stack and k not in e:
+              stack.append(k)
+  #e.remove(start)
+  return e       
 
 # BFS:
 #def BFS(matrix,start,end,bonus=None):
+
+
 
 
 if __name__=="__main__":
