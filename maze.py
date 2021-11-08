@@ -1,7 +1,7 @@
 with open('maze_map.txt', 'w') as outfile:
   outfile.write('2\n')
-  outfile.write('3 6 -3\n')
-  outfile.write('5 14 -1\n')
+  outfile.write('3 6 -10\n')
+  outfile.write('5 14 -2\n')
   outfile.write('xxxxxxxxxxxxxxxxxxxxxx\n')
   outfile.write('x   x   xx xx        x\n')
   outfile.write('x     x     xxxxxxxxxx\n')
@@ -244,29 +244,39 @@ def A_star(matrix,start,end):
 
 
 
-def heuristic_bonus(start, end, bonus):
-    heuristic(start,bonus) + heuristic(bonus, end) + bonus[2]
+def heuristic_bonus(bonus, length):
+    return bonus[2] + length
 
 def Greedy_BFS(matrix, start, end, bonus = None):
-    route_full = []
+    C = len(matrix[0])
     open = PriorityQueue()
-    open.put(heuristic(start,end),start)
-    end_point = (end, 0)
-    points = bonus+end
+    open.put((0,start,[start]))
+    end_point = end[0], end[1], 0
+    points = bonus + [end_point]
+    visit = {}
+    for i in points:
+        visit[i] = False
+
     while not open.empty():
         currCell = open.get()
-        for b in bonus:
-            leng, route = A_star(matrix, currCell, b)
-            cost = leng + b[2]
-            route_full += route
-            heuristic_bonus()
-            open.put(cost, b, route)
+        cur = currCell[1]
+        
+        visit[cur] = True
+        if (cur == end_point):
+            return currCell[0], currCell[2]
+
+        for p in points:
+            if (visit[p]): continue
+            leng, route = A_star(matrix, (cur[0],cur[1]), (p[0],p[1]))
+            
+            cost = heuristic_bonus(p, leng)
+            open.put((currCell[0]+cost, p, currCell[2]+route))
 
 
 
 if __name__=="__main__":
     b,m,s,e =read_file()
-    lenOfRoute, route, path = BFS_bonus(m,s,e)
+    lenOfRoute, Route = Greedy_BFS(m,s,e,b)
     
-    visualize_maze(m,b,s,e,route,path)
+    visualize_maze(m,b,s,e,Route)
     
