@@ -102,6 +102,7 @@ def read_file(file_name: str = 'maze_map.txt'):
                 pass
 
     return bonus_points, matrix, start, end
+<<<<<<< HEAD
 
 # BFS without bonus point:
 def BFS(matrix,start,end):
@@ -152,6 +153,33 @@ def BFS_bonus(matrix,start,end,bonus=None):
             path.append((nr,nc))
 
 def DFS_a(matrix,start,end):
+=======
+  
+  
+def DFS(matrix,start,end,bonus=None):
+  stack = [start]
+  e = []
+  while len(stack)!=0:
+      s = stack.pop()
+      e.append(s)
+      neighbor=[]
+      for i in [-1,1]: 
+          if matrix[s[0]][s[1]+i] != 'x':
+              neighbor.append((s[0],s[1]+i))
+      for i in [-1,1]:
+          if matrix[s[0]+i][s[1]] != 'x':
+              neighbor.append((s[0]+i,s[1]))
+      if(end in neighbor):
+          e.append(end)
+          return e
+      for k in neighbor:
+          if k not in stack and k not in e:
+              stack.append(k)
+  #e.remove(start)
+  return e       
+#DFS without bonus point
+def DFS_a(matrix,start,end): #simular with BFS, change queue to stack
+>>>>>>> dc8ec516fe58e9d9a568e83ab4eda44ee79ecc87
     stack = [start]
     R, C = len(matrix), len(matrix[0])
     stack.append((start[0], start[1], 0, [start[0] * C + start[1]]))
@@ -169,7 +197,11 @@ def DFS_a(matrix,start,end):
             nr, nc = coord[0] + dir[0], coord[1] + dir[1]
             if (nr < 0 or nr >= R or nc < 0 or nc >= C or matrix[nr][nc] == "x" or visited[nr][nc]): continue
             stack.append((nr, nc, coord[2] + 1, coord[3] + [nr * C + nc]))
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> dc8ec516fe58e9d9a568e83ab4eda44ee79ecc87
 def DFS_b(matrix,start,end):
     directions = [[0, 1], [0, -1], [1, 0], [-1, 0]]
     R, C = len(matrix), len(matrix[0])
@@ -195,7 +227,11 @@ def DFS_b(matrix,start,end):
     route = []
     cell = end
     lenOfRoute = 0
+<<<<<<< HEAD
     while cell!=start: #reverse path to find route
+=======
+    while cell!=start: #find route from end to start
+>>>>>>> dc8ec516fe58e9d9a568e83ab4eda44ee79ecc87
         fwdPath[dfsPath[cell]]=cell
         cell=dfsPath[cell]
         route.append(cell)
@@ -203,6 +239,31 @@ def DFS_b(matrix,start,end):
     route.reverse()
     return lenOfRoute, route  
 
+<<<<<<< HEAD
+=======
+# BFS without bonus point:
+def BFS(matrix,start,end):
+    from collections import deque
+    queue = deque()
+
+    R, C = len(matrix), len(matrix[0])
+    queue.appendleft((start[0], start[1], 0, [start[0] * C + start[1]]))
+    directions = [[0, 1], [0, -1], [1, 0], [-1, 0]]
+    visited = [[False] * C for _ in range(R)]
+
+    while len(queue) != 0:
+        coord = queue.pop()
+        visited[coord[0]][coord[1]] = True
+
+        if (coord[0],coord[1]) == end:
+            return coord[2], [(i//C, i%C) for i in coord[3]] # Return path length, boxes on path
+
+        for dir in directions:
+            nr, nc = coord[0] + dir[0], coord[1] + dir[1]
+            if (nr < 0 or nr >= R or nc < 0 or nc >= C or matrix[nr][nc] == "x" or visited[nr][nc]): continue
+            queue.appendleft((nr, nc, coord[2] + 1, coord[3] + [nr * C + nc]))
+
+>>>>>>> dc8ec516fe58e9d9a568e83ab4eda44ee79ecc87
 #A-star
 def heuristic(cell1,cell2):
     '''Heuristic function'''
@@ -212,6 +273,10 @@ def heuristic(cell1,cell2):
     return abs(x1-x2) + abs(y1-y2)
 
 def A_star(matrix,start,end):
+<<<<<<< HEAD
+=======
+    from queue import PriorityQueue
+>>>>>>> dc8ec516fe58e9d9a568e83ab4eda44ee79ecc87
     queue = PriorityQueue()
 
     R, C = len(matrix), len(matrix[0])
@@ -242,6 +307,14 @@ def A_star(matrix,start,end):
             h = heuristic((nr,nc),end)
             queue.put((h+g, h, nr, nc, g, coord[5] + [nr * C + nc]))
 
+<<<<<<< HEAD
+=======
+if __name__=="__main__":
+    b,m,s,e =read_file()
+    route = DFS(m,s,e,b)
+    print(route)
+    visualize_maze(m,b,s,e,route)
+>>>>>>> dc8ec516fe58e9d9a568e83ab4eda44ee79ecc87
 
 
 
