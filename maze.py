@@ -15,9 +15,11 @@ with open('maze_map.txt', 'w') as outfile:
   outfile.write('xxxxxxxxxxxxxxxxxxxxxx')
 
 import os
+from queue import PriorityQueue
+from collections import deque
 import matplotlib.pyplot as plt
 
-def visualize_maze(matrix, bonus, start, end, route=None):
+def visualize_maze(matrix, bonus, start, end, route=None, path=None):
     """
     Args:
       1. matrix: The matrix read from the input file,
@@ -56,7 +58,9 @@ def visualize_maze(matrix, bonus, start, end, route=None):
 
     plt.scatter(start[1],-start[0],marker='*',
                 s=100,color='gold')
-
+    if path:
+        plt.scatter([i[1] for i in path],[-i[0] for i in path],
+                s=3,color='blue')
     if route:
         for i in range(len(route)-2):
             plt.scatter(route[i+1][1],-route[i+1][0],
@@ -99,50 +103,171 @@ def read_file(file_name: str = 'maze_map.txt'):
 
     return bonus_points, matrix, start, end
 
-# BFS:
-#def BFS(matrix,start,end,bonus=None):
-class Node:
-    def __init__(self, point: tuple[int, int], parent, deep,act):
-        self.point = point
-        self.parent = parent
-        self.deep = deep
-        self.act = act
-        
-    
-    def Up(self):
-        point = (self.point[0],self.point[1]+1)
-        deep = self.deep + 1
-        return Node(point, self, deep, "up")
-    def Down(self):
-        point = (self.point[0],self.point[1]-1)
-        deep = self.deep + 1
-        return Node(point, self, deep, "down")
+# BFS without bonus point:
+def BFS(matrix,start,end):
 
-def Append(node):
-    child = []
-    child.append(node.Up())
-    child.append(node.Down())
-    child.append(node.Left())
-    child.append(node.Right())
-    return child
+    queue = deque()
+
+    R, C = len(matrix), len(matrix[0])
+    queue.appendleft((start[0], start[1], 0, [start[0] * C + start[1]]))
+    #directions = [[0, 1], [0, -1], [1, 0], [-1, 0]]
+    directions = [[-1, 0], [1, 0], [0, 1], [0, -1]]
+    visited = [[False] * C for _ in range(R)]
+
+    while len(queue) != 0:
+        coord = queue.pop()
+        visited[coord[0]][coord[1]] = True
+
+        if (coord[0],coord[1]) == end:
+            return coord[2], [(i//C, i%C) for i in coord[3]] # Return path length, boxes on path
+
+        for dir in directions:
+            nr, nc = coord[0] + dir[0], coord[1] + dir[1]
+            if (nr < 0 or nr >= R or nc < 0 or nc >= C or matrix[nr][nc] == "x" or visited[nr][nc]): 
+                continue
+            queue.appendleft((nr, nc, coord[2] + 1, coord[3] + [nr * C + nc]))
+
+# BFS with bonus:
+def BFS_bonus(matrix,start,end,bonus=None):
     
-def TDG_Reserve(node, end, limit):
-    if (node.point == end):
-        return "stop"
-    elif (node.deep < limit):
-        return "fail"
-    else:
-        for child_node in Append(node):
-            kq = TDG_Reserve(child_node, end, limit)
-def DFS(matrix, start, end, bonus = None):
-    s = Node(start[0], start[1],None,0)
-    limit = len(matrix)
-    return TDG_Reserve(s, end, limit)
+    queue = deque()
+
+    R, C = len(matrix), len(matrix[0])
+    queue.appendleft((start[0], start[1], 0, [start[0] * C + start[1]]))
+    directions = [[0, 1], [0, -1], [1, 0], [-1, 0]]
+    visited = [[False] * C for _ in range(R)]
+    path = []
+    while len(queue) != 0:
+        coord = queue.pop()
+        visited[coord[0]][coord[1]] = True
+
+        if (coord[0],coord[1]) == end:
+            return coord[2], [(i//C, i%C) for i in coord[3]], path # Return path length, boxes on path
+
+        for dir in directions:
+            nr, nc = coord[0] + dir[0], coord[1] + dir[1]
+            if (nr < 0 or nr >= R or nc < 0 or nc >= C or matrix[nr][nc] == "x" or visited[nr][nc]): 
+                continue
+            queue.appendleft((nr, nc, coord[2] + 1, coord[3] + [nr * C + nc]))
+            path.append((nr,nc))
+
+def DFS_a(matrix,start,end):
+    stack = [start]
+    R, C = len(matrix), len(matrix[0])
+    stack.append((start[0], start[1], 0, [start[0] * C + start[1]]))
+    directions = [[0, 1], [0, -1], [1, 0], [-1, 0]]
+    visited = [[False] * C for _ in range(R)]
+
+    while len(stack) != 0:
+        coord = stack.pop()
+        visited[coord[0]][coord[1]] = True
+
+        if (coord[0],coord[1]) == end:
+            return coord[2], [(i//C, i%C) for i in coord[3]] # Return path length, boxes on path
+
+        for dir in directions:
+            nr, nc = coord[0] + dir[0], coord[1] + dir[1]
+            if (nr < 0 or nr >= R or nc < 0 or nc >= C or matrix[nr][nc] == "x" or visited[nr][nc]): continue
+            stack.append((nr, nc, coord[2] + 1, coord[3] + [nr * C + nc]))
+
+def DFS_b(matrix,start,end):
+    directions = [[0, 1], [0, -1], [1, 0], [-1, 0]]
+    R, C = len(matrix), len(matrix[0])
+    visited = [[False] * C for _ in range(R)]
+    #stack
+    explored=[start]
+    frontier=[start]
+    dfsPath={}
+    while len(frontier)>0:
+        coord=frontier.pop()
+        visited[coord[0]][coord[1]] = True
+        if coord==end:
+            break
+        for dir in directions:
+            nr, nc = coord[0] + dir[0], coord[1] + dir[1]
+            if (nr < 0 or nr >= R or nc < 0 or nc >= C or matrix[nr][nc] == "x" or visited[nr][nc]): continue
+            child = nr,nc
+            explored.append(child)
+            frontier.append(child)
+            dfsPath[child]=coord
+        
+    fwdPath = {}
+    route = []
+    cell = end
+    lenOfRoute = 0
+    while cell!=start: #reverse path to find route
+        fwdPath[dfsPath[cell]]=cell
+        cell=dfsPath[cell]
+        route.append(cell)
+        lenOfRoute = lenOfRoute+1
+    route.reverse()
+    return lenOfRoute, route  
+
+#A-star
+def heuristic(cell1,cell2):
+    '''Heuristic function'''
+    x1,y1=cell1
+    x2,y2=cell2
+
+    return abs(x1-x2) + abs(y1-y2)
+
+def A_star(matrix,start,end):
+    queue = PriorityQueue()
+
+    R, C = len(matrix), len(matrix[0])
+    h0 = heuristic(start,end)
+    queue.put((h0+0,h0,start[0], start[1], 0, [start[0] * C + start[1]]))
+    directions = [[0, 1], [0, -1], [1, 0], [-1, 0]]
+    visited = [[False] * C for _ in range(R)]
+
+    while not queue.empty():
+        coord = queue.get()
+        '''
+        coord[0]: f() = h() + g()
+        coord[1]: h()
+        coord[2][3]: cell point
+        coord[4]: g() (length)
+        coord[5]: route
+        '''
+        visited[coord[2]][coord[3]] = True
+
+        if (coord[2],coord[3]) == end:
+            return coord[4], [(i//C, i%C) for i in coord[5]] # Return path length, boxes on path
+
+        for dir in directions:
+            nr, nc = coord[2] + dir[0], coord[3] + dir[1]
+            g = coord[2] + 1
+            if (nr < 0 or nr >= R or nc < 0 or nc >= C or matrix[nr][nc] == "x" or visited[nr][nc]): continue
+            g = coord[4] + 1
+            h = heuristic((nr,nc),end)
+            queue.put((h+g, h, nr, nc, g, coord[5] + [nr * C + nc]))
+
+
+
+
+def heuristic_bonus(start, end, bonus):
+    heuristic(start,bonus) + heuristic(bonus, end) + bonus[2]
+
+def Greedy_BFS(matrix, start, end, bonus = None):
+    route_full = []
+    open = PriorityQueue()
+    open.put(heuristic(start,end),start)
+    end_point = (end, 0)
+    points = bonus+end
+    while not open.empty():
+        currCell = open.get()
+        for b in bonus:
+            leng, route = A_star(matrix, currCell, b)
+            cost = leng + b[2]
+            route_full += route
+            heuristic_bonus()
+            open.put(cost, b, route)
+
+
 
 if __name__=="__main__":
-    #b,m,s,e =read_file()
-    #visualize_maze(m,b,s,e)
-    s = (2,2)
-    e = (2,1)
-    Append(s,e)
-
+    b,m,s,e =read_file()
+    lenOfRoute, route, path = BFS_bonus(m,s,e)
+    
+    visualize_maze(m,b,s,e,route,path)
+    
