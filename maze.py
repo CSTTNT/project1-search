@@ -173,8 +173,9 @@ def DFS_b(matrix,start,end):
         lenOfRoute = lenOfRoute+1
     route.reverse()
     return lenOfRoute, route  
-# BFS with bonus:
-def BFS_bonus(matrix,start,end,bonus):
+
+# BFS without bonus point:
+def BFS(matrix,start,end):
     from collections import deque
     queue = deque()
 
@@ -194,9 +195,46 @@ def BFS_bonus(matrix,start,end,bonus):
             nr, nc = coord[0] + dir[0], coord[1] + dir[1]
             if (nr < 0 or nr >= R or nc < 0 or nc >= C or matrix[nr][nc] == "x" or visited[nr][nc]): continue
             queue.appendleft((nr, nc, coord[2] + 1, coord[3] + [nr * C + nc]))
-            if (nr, nc) == (bonus[0], bonus[1]):
-                queue.appendleft(nr, nc, coord[2] + 1 + bonus[2], coord[3] + [nr * C + nc])
 
+#A-star
+def heuristic(cell1,cell2):
+    '''Heuristic function'''
+    x1,y1=cell1
+    x2,y2=cell2
+
+    return abs(x1-x2) + abs(y1-y2)
+
+def A_star(matrix,start,end):
+    from queue import PriorityQueue
+    queue = PriorityQueue()
+
+    R, C = len(matrix), len(matrix[0])
+    h0 = heuristic(start,end)
+    queue.put((h0+0,h0,start[0], start[1], 0, [start[0] * C + start[1]]))
+    directions = [[0, 1], [0, -1], [1, 0], [-1, 0]]
+    visited = [[False] * C for _ in range(R)]
+
+    while not queue.empty():
+        coord = queue.get()
+        '''
+        coord[0]: f() = h() + g()
+        coord[1]: h()
+        coord[2][3]: cell point
+        coord[4]: g() (length)
+        coord[5]: route
+        '''
+        visited[coord[2]][coord[3]] = True
+
+        if (coord[2],coord[3]) == end:
+            return coord[4], [(i//C, i%C) for i in coord[5]] # Return path length, boxes on path
+
+        for dir in directions:
+            nr, nc = coord[2] + dir[0], coord[3] + dir[1]
+            g = coord[2] + 1
+            if (nr < 0 or nr >= R or nc < 0 or nc >= C or matrix[nr][nc] == "x" or visited[nr][nc]): continue
+            g = coord[4] + 1
+            h = heuristic((nr,nc),end)
+            queue.put((h+g, h, nr, nc, g, coord[5] + [nr * C + nc]))
 
 if __name__=="__main__":
     b,m,s,e =read_file()
