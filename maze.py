@@ -1,6 +1,6 @@
 with open('maze_map.txt', 'w') as outfile:
   outfile.write('2\n')
-  outfile.write('3 6 -10\n')
+  outfile.write('3 6 -5\n')
   outfile.write('5 14 -2\n')
   outfile.write('xxxxxxxxxxxxxxxxxxxxxx\n')
   outfile.write('x   x   xx xx        x\n')
@@ -127,9 +127,11 @@ def BFS(matrix,start,end):
                 continue
             queue.appendleft((nr, nc, coord[2] + 1, coord[3] + [nr * C + nc]))
 
-# BFS with bonus:
-def BFS_bonus(matrix,start,end,bonus=None):
-    
+# BFS with path:
+def BFS_path(matrix,start,end):
+    '''
+    return length of route, route to goal, all route go through
+    '''
     queue = deque()
 
     R, C = len(matrix), len(matrix[0])
@@ -248,11 +250,16 @@ def heuristic_bonus(bonus, length):
     return bonus[2] + length
 
 def Greedy_BFS(matrix, start, end, bonus = None):
-    C = len(matrix[0])
+    
+    '''go through all bonus point to find the route with lowest cost'''
+    
     open = PriorityQueue()
     open.put((0,start,[start]))
+
+    #add end to point 
     end_point = end[0], end[1], 0
     points = bonus + [end_point]
+
     visit = {}
     for i in points:
         visit[i] = False
