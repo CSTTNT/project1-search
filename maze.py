@@ -1,18 +1,18 @@
-with open('maze_map.txt', 'w') as outfile:
-  outfile.write('2\n')
-  outfile.write('3 6 -5\n')
-  outfile.write('5 14 -2\n')
-  outfile.write('xxxxxxxxxxxxxxxxxxxxxx\n')
-  outfile.write('x   x   xx xx        x\n')
-  outfile.write('x     x     xxxxxxxxxx\n')
-  outfile.write('x x   +xx  xxxx xxx xx\n')
-  outfile.write('  x   x x xx   xxxx  x\n')
-  outfile.write('x          xx +xx  x x\n')
-  outfile.write('xxxxxxx x      xx  x x\n')
-  outfile.write('xxxxxxxxx  x x  xx   x\n')
-  outfile.write('x          x x Sx x  x\n')
-  outfile.write('xxxxx x  x x x     x x\n')
-  outfile.write('xxxxxxxxxxxxxxxxxxxxxx')
+# with open('maze_map.txt', 'w') as outfile:
+#   outfile.write('2\n')
+#   outfile.write('3 6 -3\n')
+#   outfile.write('5 14 -1\n')
+#   outfile.write('xxxxxxxxxxxxxxxxxxxxxx\n')
+#   outfile.write('x   x   xx xx        x\n')
+#   outfile.write('x     x     xxxxxxxxxx\n')
+#   outfile.write('x x   +xx  xxxx xxx xx\n')
+#   outfile.write('  x   x x xx   xxxx  x\n')
+#   outfile.write('x          xx +xx  x x\n')
+#   outfile.write('xxxxxxx x      xx  x x\n')
+#   outfile.write('xxxxxxxxx  x x  xx   x\n')
+#   outfile.write('x          x x Sx x  x\n')
+#   outfile.write('xxxxx x  x x x     x x\n')
+#   outfile.write('xxxxxxxxxxxxxxxxxxxxxx')
 
 import os
 from queue import PriorityQueue
@@ -250,7 +250,7 @@ def heuristic_bonus(bonus, length):
     return bonus[2] + length
 
 def Greedy_BFS(matrix, start, end, bonus = None):
-    
+
     '''go through all bonus point to find the route with lowest cost'''
     
     open = PriorityQueue()
@@ -282,8 +282,8 @@ def Greedy_BFS(matrix, start, end, bonus = None):
 
 
 if __name__=="__main__":
-    b,m,s,e =read_file()
+    b,m,s,e =read_file('map1.txt')
     lenOfRoute, Route = Greedy_BFS(m,s,e,b)
-    
+    print('Cost:', lenOfRoute)
     visualize_maze(m,b,s,e,Route)
     
