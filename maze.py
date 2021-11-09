@@ -304,19 +304,21 @@ def Greedy_BFS(matrix, start, end, bonus = None):
 
 
 if __name__=="__main__":
-    b,m,s,e =read_file('map5.txt')
-    lenOfRoute, Route, path = BFS_path(m,s,e)
+    b,m,s,e =read_file('map7.txt')
+    lenOfRoute, Route, path = A_star(m,s,e)
     print('Cost:', lenOfRoute)
     visualize_maze(m,b,s,e,Route, path)
 
 '''
     mapN.txt: map without bonus
     mapN_b.txt: map with bonus
-    map1: (40,80) random
+    map1: (40,80) Prim
     map2: (20,40) Back tracking generator
     map3: (20,40) Dongeon rooms generator
     map4: (20,40) Growing tree generator
     map5: (20,40) Binary tree generator
+    map6: (20,40) Ellers generator
+    map7: (20,40) Trivial maze generator
     https://github.com/john-science/mazelib/tree/master/mazelib/generate
 '''
     
