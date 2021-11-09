@@ -203,7 +203,25 @@ def DFS_b(matrix,start,end):
         lenOfRoute = lenOfRoute+1
     route.reverse()
     return lenOfRoute, route  
+def DFS_path(matrix,start,end):
+    stack = [start]
+    R, C = len(matrix), len(matrix[0])
+    stack.append((start[0], start[1], 0, [start[0] * C + start[1]]))
+    directions = [[0, 1], [0, -1], [1, 0], [-1, 0]]
+    visited = [[False] * C for _ in range(R)]
+    path = []
+    while len(stack) != 0:
+        coord = stack.pop()
+        visited[coord[0]][coord[1]] = True
 
+        if (coord[0],coord[1]) == end:
+            return coord[2], [(i//C, i%C) for i in coord[3]], path # Return path length, boxes on path
+
+        for dir in directions:
+            nr, nc = coord[0] + dir[0], coord[1] + dir[1]
+            if (nr < 0 or nr >= R or nc < 0 or nc >= C or matrix[nr][nc] == "x" or visited[nr][nc]): continue
+            stack.append((nr, nc, coord[2] + 1, coord[3] + [nr * C + nc]))
+            path.append((nr,nc))
 #A-star
 def heuristic(cell1,cell2):
     '''Heuristic function'''
@@ -220,7 +238,7 @@ def A_star(matrix,start,end):
     queue.put((h0+0,h0,start[0], start[1], 0, [start[0] * C + start[1]]))
     directions = [[0, 1], [0, -1], [1, 0], [-1, 0]]
     visited = [[False] * C for _ in range(R)]
-
+    path = []
     while not queue.empty():
         coord = queue.get()
         '''
@@ -231,9 +249,9 @@ def A_star(matrix,start,end):
         coord[5]: route
         '''
         visited[coord[2]][coord[3]] = True
-
+        
         if (coord[2],coord[3]) == end:
-            return coord[4], [(i//C, i%C) for i in coord[5]] # Return path length, boxes on path
+            return coord[4], [(i//C, i%C) for i in coord[5]], path # Return path length, boxes on path
 
         for dir in directions:
             nr, nc = coord[2] + dir[0], coord[3] + dir[1]
@@ -242,6 +260,7 @@ def A_star(matrix,start,end):
             g = coord[4] + 1
             h = heuristic((nr,nc),end)
             queue.put((h+g, h, nr, nc, g, coord[5] + [nr * C + nc]))
+            path.append((nr,nc))
 
 
 
@@ -255,7 +274,7 @@ def Greedy_BFS(matrix, start, end, bonus = None):
     
     open = PriorityQueue()
     open.put((0,start,[start]))
-    path = [] #contain all cell visited
+    all_path = [] #contain all cell visited
 
     #add end to point 
     end_point = end[0], end[1], 0
@@ -276,17 +295,28 @@ def Greedy_BFS(matrix, start, end, bonus = None):
 
         for p in points:
             if (visit[p]): continue
-            leng, route = A_star(matrix, (cur[0],cur[1]), (p[0],p[1]))
+            leng, route, path = A_star(matrix, (cur[0],cur[1]), (p[0],p[1]))
             
             cost = heuristic_bonus(p, leng)
             open.put((currCell[0]+cost, p, currCell[2]+route))
-            path += route
+            all_path += path
 
 
 
 if __name__=="__main__":
-    b,m,s,e =read_file('map3.txt')
-    lenOfRoute, Route, path = Greedy_BFS(m,s,e,b)
+    b,m,s,e =read_file('map5.txt')
+    lenOfRoute, Route, path = BFS_path(m,s,e)
     print('Cost:', lenOfRoute)
     visualize_maze(m,b,s,e,Route, path)
+
+'''
+    mapN.txt: map without bonus
+    mapN_b.txt: map with bonus
+    map1: (40,80) random
+    map2: (20,40) Back tracking generator
+    map3: (20,40) Dongeon rooms generator
+    map4: (20,40) Growing tree generator
+    map5: (20,40) Binary tree generator
+    https://github.com/john-science/mazelib/tree/master/mazelib/generate
+'''
     

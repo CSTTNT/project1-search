@@ -1,4 +1,7 @@
-0
+3
+11 11 -5
+17 17 -10
+15 38 -20
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 x     x   x x   x   x     x   x         x
 xxxxx x xxx xxx x xxx x xxx x xxx x xxxxx
