@@ -255,6 +255,7 @@ def Greedy_BFS(matrix, start, end, bonus = None):
     
     open = PriorityQueue()
     open.put((0,start,[start]))
+    path = [] #contain all cell visited
 
     #add end to point 
     end_point = end[0], end[1], 0
@@ -264,13 +265,14 @@ def Greedy_BFS(matrix, start, end, bonus = None):
     for i in points:
         visit[i] = False
 
+    
     while not open.empty():
         currCell = open.get()
         cur = currCell[1]
         
         visit[cur] = True
         if (cur == end_point):
-            return currCell[0], currCell[2]
+            return currCell[0], currCell[2], path
 
         for p in points:
             if (visit[p]): continue
@@ -278,12 +280,13 @@ def Greedy_BFS(matrix, start, end, bonus = None):
             
             cost = heuristic_bonus(p, leng)
             open.put((currCell[0]+cost, p, currCell[2]+route))
+            path += route
 
 
 
 if __name__=="__main__":
-    b,m,s,e =read_file('map1.txt')
-    lenOfRoute, Route = Greedy_BFS(m,s,e,b)
+    b,m,s,e =read_file('map3.txt')
+    lenOfRoute, Route, path = Greedy_BFS(m,s,e,b)
     print('Cost:', lenOfRoute)
-    visualize_maze(m,b,s,e,Route)
+    visualize_maze(m,b,s,e,Route, path)
     
